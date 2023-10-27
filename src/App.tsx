@@ -1,12 +1,18 @@
 import * as React from 'react';
 
-const title : string = "Hello TypeScript React";
+interface welcome {
+  greeting: string,
+  title: string,
+}
 
+const welcomeStrings: welcome = { greeting: "Hey", title: "React"};
 
 function App() {
   return (
     <div>
-      <h1>{title}</h1>
+      <h1>{welcomeStrings.greeting} {welcomeStrings.title}</h1>
+      <label htmlFor="search">Search:</label>
+      <input id="search" type="text" />
     </div>
   );
 }
