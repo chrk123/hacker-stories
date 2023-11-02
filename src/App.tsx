@@ -1,12 +1,12 @@
-import * as React from 'react';
+import * as React from "react";
 
 interface Book {
-  title: string,
-  url: string,
-  author: string,
-  num_comments: number,
-  points: number,
-  objectID: number,
+  title: string;
+  url: string;
+  author: string;
+  num_comments: number;
+  points: number;
+  objectID: number;
 }
 
 const list: Book[] = [
@@ -26,11 +26,11 @@ const list: Book[] = [
     points: 5,
     objectID: 1,
   },
-]
+];
 
 interface welcome {
-  greeting: string,
-  title: string,
+  greeting: string;
+  title: string;
 }
 
 const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
@@ -38,23 +38,25 @@ const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
 function App() {
   return (
     <div>
-      <h1>{welcomeStrings.greeting} {welcomeStrings.title}</h1>
+      <h1>
+        {welcomeStrings.greeting} {welcomeStrings.title}
+      </h1>
       <label htmlFor="search">Search:</label>
       <input id="search" type="text" />
 
       <hr />
 
       <ul>
-        {list.map(item =>
+        {list.map((item) => (
           <li key={item.objectID}>
             <span>
               <a href={item.url}>{item.title}:</a>
             </span>
-            <span> {item.author}</span>
+            <span>, {item.author}</span>
             <span>, {item.num_comments}</span>
             <span>, {item.points}</span>
-          </li>)
-        }
+          </li>
+        ))}
       </ul>
     </div>
   );
