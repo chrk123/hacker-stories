@@ -35,49 +35,43 @@ interface welcome {
 
 const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
 
-const App = () => {
-  return (
-    <div>
-      <h1>
-        {welcomeStrings.greeting} {welcomeStrings.title}
-      </h1>
-      <Search />
+const App = () => (
+  <div>
+    <h1>
+      {welcomeStrings.greeting} {welcomeStrings.title}
+    </h1>
+    <Search />
 
-      <hr />
+    <hr />
 
-      <List />
+    <List />
 
-      <hr />
+    <hr />
 
-      <List />
-    </div>
-  );
-};
+    <List />
+  </div>
+);
 
-const Search = () => {
-  return (
-    <div>
-      <label htmlFor="search">Search:</label>
-      <input id="search" type="text" />
-    </div>
-  );
-};
+const Search = () => (
+  <div>
+    <label htmlFor="search">Search:</label>
+    <input id="search" type="text" />
+  </div>
+);
 
-const List = () => {
-  return (
-    <ul>
-      {list.map((item) => (
-        <li key={item.objectID}>
-          <span>
-            <a href={item.url}>{item.title}:</a>
-          </span>
-          <span>, {item.author}</span>
-          <span>, {item.num_comments}</span>
-          <span>, {item.points}</span>
-        </li>
-      ))}
-    </ul>
-  );
-};
+const List = () => (
+  <ul>
+    {list.map((item) => (
+      <li key={item.objectID}>
+        <span>
+          <a href={item.url}>{item.title}:</a>
+        </span>
+        <span>, {item.author}</span>
+        <span>, {item.num_comments}</span>
+        <span>, {item.points}</span>
+      </li>
+    ))}
+  </ul>
+);
 
 export default App;
