@@ -52,12 +52,19 @@ const App = () => (
   </div>
 );
 
-const Search = () => (
-  <div>
-    <label htmlFor="search">Search:</label>
-    <input id="search" type="text" />
-  </div>
-);
+const Search = () => {
+  const logEvent = (event) => {
+    console.log(event);
+    console.log(event.target.value);
+  };
+
+  return (
+    <div>
+      <label htmlFor="search">Search:</label>
+      <input id="search" type="text" onChange={logEvent}/>
+    </div>
+  );
+};
 
 const List = () => (
   <ul>
