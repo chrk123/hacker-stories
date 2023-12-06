@@ -35,7 +35,7 @@ interface welcome {
 
 const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
 
-function App() {
+const App = () => {
   return (
     <div>
       <h1>
@@ -52,18 +52,18 @@ function App() {
       <List />
     </div>
   );
-}
+};
 
-function Search() {
+const Search = () => {
   return (
     <div>
       <label htmlFor="search">Search:</label>
       <input id="search" type="text" />
     </div>
   );
-}
+};
 
-function List() {
+const List = () => {
   return (
     <ul>
       {list.map((item) => (
@@ -78,6 +78,6 @@ function List() {
       ))}
     </ul>
   );
-}
+};
 
 export default App;
