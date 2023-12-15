@@ -35,6 +35,8 @@ const App = () => {
     },
   ];
 
+  console.log("App renders");
+
   return (
     <div>
       <h1>
@@ -54,15 +56,22 @@ const App = () => {
 };
 
 const Search = () => {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
   const logEvent = (event) => {
-    console.log(event);
-    console.log(event.target.value);
+    setSearchTerm(event.target.value);
   };
+
+  console.log("Search renders");
 
   return (
     <div>
       <label htmlFor="search">Search:</label>
       <input id="search" type="text" onChange={logEvent} />
+
+      <p>
+        Searching for <strong>{searchTerm}</strong>.
+      </p>
     </div>
   );
 };
@@ -71,27 +80,33 @@ interface ListProps {
   list: Book[];
 }
 
-const List = (props: ListProps) => (
-  <ul>
-    {props.list.map((item) => (
-      <Item key={item.objectID} item={item} />
-    ))}
-  </ul>
-);
+const List = (props: ListProps) => {
+  console.log("List renders");
+  return (
+    <ul>
+      {props.list.map((item) => (
+        <Item key={item.objectID} item={item} />
+      ))}
+    </ul>
+  );
+};
 
 interface ItemProps {
   item: Book;
 }
 
-const Item = (props: ItemProps) => (
-  <li>
-    <span>
-      <a href={props.item.url}>{props.item.title}:</a>
-    </span>
-    <span>, {props.item.author}</span>
-    <span>, {props.item.num_comments}</span>
-    <span>, {props.item.points}</span>
-  </li>
-);
+const Item = (props: ItemProps) => {
+  console.log("Item renders");
+  return (
+    <li>
+      <span>
+        <a href={props.item.url}>{props.item.title}:</a>
+      </span>
+      <span>, {props.item.author}</span>
+      <span>, {props.item.num_comments}</span>
+      <span>, {props.item.points}</span>
+    </li>
+  );
+};
 
 export default App;
