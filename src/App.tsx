@@ -8,26 +8,6 @@ interface Book {
   points: number;
   objectID: number;
 }
-
-const list: Book[] = [
-  {
-    title: "React",
-    url: "https://reactjs.org/",
-    author: "Jordan Walke",
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: "Redux",
-    url: "https://redux.js.org/",
-    author: "Dan Abramov, Andrew Clark",
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-];
-
 interface welcome {
   greeting: string;
   title: string;
@@ -35,22 +15,43 @@ interface welcome {
 
 const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
 
-const App = () => (
-  <div>
-    <h1>
-      {welcomeStrings.greeting} {welcomeStrings.title}
-    </h1>
-    <Search />
+const App = () => {
+  const stories: Book[] = [
+    {
+      title: "React",
+      url: "https://reactjs.org/",
+      author: "Jordan Walke",
+      num_comments: 3,
+      points: 4,
+      objectID: 0,
+    },
+    {
+      title: "Redux",
+      url: "https://redux.js.org/",
+      author: "Dan Abramov, Andrew Clark",
+      num_comments: 2,
+      points: 5,
+      objectID: 1,
+    },
+  ];
 
-    <hr />
+  return (
+    <div>
+      <h1>
+        {welcomeStrings.greeting} {welcomeStrings.title}
+      </h1>
+      <Search />
 
-    <List />
+      <hr />
 
-    <hr />
+      <List list={stories} />
 
-    <List />
-  </div>
-);
+      <hr />
+
+      <List list={stories} />
+    </div>
+  );
+};
 
 const Search = () => {
   const logEvent = (event) => {
@@ -61,14 +62,18 @@ const Search = () => {
   return (
     <div>
       <label htmlFor="search">Search:</label>
-      <input id="search" type="text" onChange={logEvent}/>
+      <input id="search" type="text" onChange={logEvent} />
     </div>
   );
 };
 
-const List = () => (
+interface ListProps {
+  list: Book[];
+}
+
+const List = (props: ListProps) => (
   <ul>
-    {list.map((item) => (
+    {props.list.map((item) => (
       <li key={item.objectID}>
         <span>
           <a href={item.url}>{item.title}:</a>
