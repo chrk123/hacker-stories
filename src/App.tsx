@@ -37,8 +37,10 @@ const App = () => {
 
   console.log("App renders");
 
+  const [searchTerm, setSearchTerm] = React.useState("");
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
+    setSearchTerm(event.target.value);
   };
 
   return (
@@ -50,11 +52,11 @@ const App = () => {
 
       <hr />
 
-      <List list={stories} />
-
-      <hr />
-
-      <List list={stories} />
+      <List
+        list={stories.filter((item: Book) =>
+          item.title.toLowerCase().includes(searchTerm.toLocaleLowerCase())
+        )}
+      />
     </div>
   );
 };
@@ -64,23 +66,12 @@ interface SearchProps {
 }
 
 const Search = (props: SearchProps) => {
-  const [searchTerm, setSearchTerm] = React.useState("");
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-    props.onSearch(event);
-  };
-
   console.log("Search renders");
 
   return (
     <div>
       <label htmlFor="search">Search:</label>
-      <input id="search" type="text" onChange={handleSearch} />
-
-      <p>
-        Searching for <strong>{searchTerm}</strong>.
-      </p>
+      <input id="search" type="text" onChange={props.onSearch} />
     </div>
   );
 };
