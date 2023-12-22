@@ -37,12 +37,16 @@ const App = () => {
 
   console.log("App renders");
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value);
+  };
+
   return (
     <div>
       <h1>
         {welcomeStrings.greeting} {welcomeStrings.title}
       </h1>
-      <Search />
+      <Search onSearch={handleSearch} />
 
       <hr />
 
@@ -55,11 +59,16 @@ const App = () => {
   );
 };
 
-const Search = () => {
+interface SearchProps {
+  onSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const Search = (props: SearchProps) => {
   const [searchTerm, setSearchTerm] = React.useState("");
 
-  const logEvent = (event) => {
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+    props.onSearch(event);
   };
 
   console.log("Search renders");
@@ -67,7 +76,7 @@ const Search = () => {
   return (
     <div>
       <label htmlFor="search">Search:</label>
-      <input id="search" type="text" onChange={logEvent} />
+      <input id="search" type="text" onChange={handleSearch} />
 
       <p>
         Searching for <strong>{searchTerm}</strong>.
