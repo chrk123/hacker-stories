@@ -85,27 +85,31 @@ const List = ({ list }: ListProps) => {
   console.log("List renders");
   return (
     <ul>
-      {list.map((item) => (
-        <Item key={item.objectID} item={item} />
+      {list.map(({ objectID, ...item }) => (
+        <Item key={objectID} {...item} />
       ))}
     </ul>
   );
 };
 
 interface ItemProps {
-  item: Book;
+  title: string;
+  url: string;
+  author: string;
+  num_comments: number;
+  points: number;
 }
 
-const Item = ({ item }: ItemProps) => {
+const Item = ({ title, url, author, num_comments, points }: ItemProps) => {
   console.log("Item renders");
   return (
     <li>
       <span>
-        <a href={item.url}>{item.title}:</a>
+        <a href={url}>{title}:</a>
       </span>
-      <span>, {item.author}</span>
-      <span>, {item.num_comments}</span>
-      <span>, {item.points}</span>
+      <span>, {author}</span>
+      <span>, {num_comments}</span>
+      <span>, {points}</span>
     </li>
   );
 };
