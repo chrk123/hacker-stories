@@ -66,18 +66,13 @@ interface SearchProps {
   onSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Search = (props: SearchProps) => {
+const Search = ({ search, onSearch }: SearchProps) => {
   console.log("Search renders");
 
   return (
     <div>
       <label htmlFor="search">Search:</label>
-      <input
-        id="search"
-        type="text"
-        value={props.search}
-        onChange={props.onSearch}
-      />
+      <input id="search" type="text" value={search} onChange={onSearch} />
     </div>
   );
 };
@@ -86,11 +81,11 @@ interface ListProps {
   list: Book[];
 }
 
-const List = (props: ListProps) => {
+const List = ({ list }: ListProps) => {
   console.log("List renders");
   return (
     <ul>
-      {props.list.map((item) => (
+      {list.map((item) => (
         <Item key={item.objectID} item={item} />
       ))}
     </ul>
@@ -101,16 +96,16 @@ interface ItemProps {
   item: Book;
 }
 
-const Item = (props: ItemProps) => {
+const Item = ({ item }: ItemProps) => {
   console.log("Item renders");
   return (
     <li>
       <span>
-        <a href={props.item.url}>{props.item.title}:</a>
+        <a href={item.url}>{item.title}:</a>
       </span>
-      <span>, {props.item.author}</span>
-      <span>, {props.item.num_comments}</span>
-      <span>, {props.item.points}</span>
+      <span>, {item.author}</span>
+      <span>, {item.num_comments}</span>
+      <span>, {item.points}</span>
     </li>
   );
 };
