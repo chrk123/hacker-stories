@@ -57,7 +57,7 @@ const App = () => {
   };
 
   return (
-    <div>
+    <>
       <h1>
         {welcomeStrings.greeting} {welcomeStrings.title}
       </h1>
@@ -70,7 +70,7 @@ const App = () => {
           item.title.toLowerCase().includes(searchTerm.toLocaleLowerCase())
         )}
       />
-    </div>
+    </>
   );
 };
 
@@ -83,10 +83,10 @@ const Search = ({ search, onSearch }: SearchProps) => {
   console.log("Search renders");
 
   return (
-    <div>
+    <>
       <label htmlFor="search">Search:</label>
       <input id="search" type="text" value={search} onChange={onSearch} />
-    </div>
+    </>
   );
 };
 
