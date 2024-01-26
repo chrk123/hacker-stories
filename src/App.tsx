@@ -15,6 +15,19 @@ interface welcome {
 
 const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+const useStorageState = (key: string, initialState: string) => {
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [value, key]);
+
+  return [value, setValue];
+};
+
 const App = () => {
   const stories: Book[] = [
     {
@@ -37,13 +50,7 @@ const App = () => {
 
   console.log("App renders");
 
-  const [searchTerm, setSearchTerm] = React.useState(
-    localStorage.getItem("search") || "React"
-  );
-
-  React.useEffect(() => {
-    localStorage.setItem("search", searchTerm);
-  }, [searchTerm]);
+  const [searchTerm, setSearchTerm] = useStorageState("search", "React");
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
