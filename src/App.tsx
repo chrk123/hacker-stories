@@ -61,7 +61,15 @@ const App = () => {
       <h1>
         {welcomeStrings.greeting} {welcomeStrings.title}
       </h1>
-      <InputWithLabel id="search" label="Search" value={searchTerm} onInputChange={handleSearch} />
+      <RadioSelection id="radio" options={["a", "b"]} />
+      <br />
+      <br />
+      <InputWithLabel
+        id="search"
+        label="Search"
+        value={searchTerm}
+        onInputChange={handleSearch}
+      />
 
       <hr />
 
@@ -75,14 +83,20 @@ const App = () => {
 };
 
 interface InputWithLabelProps {
-  id: string,
-  label: string,
-  value: string,
-  type?: string,
+  id: string;
+  label: string;
+  value: string;
+  type?: string;
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const InputWithLabel = ({ id, label, type = "text", value, onInputChange }: InputWithLabelProps) => {
+const InputWithLabel = ({
+  id,
+  label,
+  type = "text",
+  value,
+  onInputChange,
+}: InputWithLabelProps) => {
   console.log("Search renders");
 
   return (
@@ -127,6 +141,33 @@ const Item = ({ title, url, author, num_comments, points }: ItemProps) => {
       <span>, {num_comments}</span>
       <span>, {points}</span>
     </li>
+  );
+};
+
+interface RadioExclusiveSelectionProps {
+  id: string;
+  options: string[];
+}
+
+const RadioSelection = ({ id, options }: RadioExclusiveSelectionProps) => {
+  return (
+    <>
+      {options.map((option: string, idx: number) => {
+        const index = `${id}_${idx}`;
+
+        return (
+          <>
+            <input
+              type="radio"
+              id={index}
+              name={`${id}_radiogroup`}
+              value={option}
+            />
+            <label htmlFor={index}>{option}</label>
+          </>
+        );
+      })}
+    </>
   );
 };
 
