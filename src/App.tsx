@@ -66,10 +66,11 @@ const App = () => {
       <br />
       <InputWithLabel
         id="search"
-        label="Search"
         value={searchTerm}
         onInputChange={handleSearch}
-      />
+      >
+        <strong>Search: </strong>
+      </InputWithLabel>
 
       <hr />
 
@@ -84,24 +85,24 @@ const App = () => {
 
 interface InputWithLabelProps {
   id: string;
-  label: string;
   value: string;
   type?: string;
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  children: React.ReactNode;
 }
 
 const InputWithLabel = ({
   id,
-  label,
   type = "text",
   value,
   onInputChange,
+  children,
 }: InputWithLabelProps) => {
   console.log("Search renders");
 
   return (
     <>
-      <label htmlFor={id}>{label}: </label>
+      <label htmlFor={id}>{children}</label>
       <input id={id} type={type} value={value} onChange={onInputChange} />
     </>
   );
