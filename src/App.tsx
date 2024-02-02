@@ -103,10 +103,25 @@ const InputWithLabel = ({
 }: InputWithLabelProps) => {
   console.log("Search renders");
 
+  const inputRef = React.useRef();
+
+  React.useEffect(() => {
+    if (isFocused && inputRef.current) {
+      // D
+      inputRef.current.focus();
+    }
+  }, [isFocused]);
+
   return (
     <>
       <label htmlFor={id}>{children}</label>
-      <input id={id} type={type} value={value} autoFocus={isFocused} onChange={onInputChange} />
+      <input
+        id={id}
+        ref={inputRef}
+        type={type}
+        value={value}
+        onChange={onInputChange}
+      />
     </>
   );
 };
