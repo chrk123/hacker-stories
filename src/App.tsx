@@ -67,6 +67,7 @@ const App = () => {
       <InputWithLabel
         id="search"
         value={searchTerm}
+        isFocused={true}
         onInputChange={handleSearch}
       >
         <strong>Search: </strong>
@@ -87,6 +88,7 @@ interface InputWithLabelProps {
   id: string;
   value: string;
   type?: string;
+  isFocused?: boolean;
   onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   children: React.ReactNode;
 }
@@ -95,6 +97,7 @@ const InputWithLabel = ({
   id,
   type = "text",
   value,
+  isFocused = false,
   onInputChange,
   children,
 }: InputWithLabelProps) => {
@@ -103,7 +106,7 @@ const InputWithLabel = ({
   return (
     <>
       <label htmlFor={id}>{children}</label>
-      <input id={id} type={type} value={value} onChange={onInputChange} />
+      <input id={id} type={type} value={value} autoFocus={isFocused} onChange={onInputChange} />
     </>
   );
 };
