@@ -15,7 +15,6 @@ interface welcome {
 
 const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
 const useStorageState = (key: string, initialState: string) => {
   const [value, setValue] = React.useState(
     localStorage.getItem(key) || initialState
@@ -25,7 +24,7 @@ const useStorageState = (key: string, initialState: string) => {
     localStorage.setItem(key, value);
   }, [value, key]);
 
-  return [value, setValue];
+  return [value, setValue] as const;
 };
 
 const App = () => {
@@ -111,7 +110,7 @@ const InputWithLabel = ({
 }: InputWithLabelProps) => {
   console.log("Search renders");
 
-  const inputRef = React.useRef();
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     if (isFocused && inputRef.current) {
