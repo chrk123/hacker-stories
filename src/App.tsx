@@ -29,7 +29,7 @@ const useStorageState = (key: string, initialState: string) => {
 };
 
 const App = () => {
-  const stories: Book[] = [
+  const defaultStories: Book[] = [
     {
       title: "React",
       url: "https://reactjs.org/",
@@ -52,9 +52,15 @@ const App = () => {
 
   const [searchTerm, setSearchTerm] = useStorageState("search", "React");
 
+  // make it stateful so rerendering happens automatically
+  const [stories, setStories] = React.useState(defaultStories);
+
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
+
+  const deleteBook = (objectID: number) =>
+    setStories(stories.filter((item: Book) => item.objectID != objectID));
 
   return (
     <>
@@ -79,6 +85,8 @@ const App = () => {
         list={stories.filter((item: Book) =>
           item.title.toLowerCase().includes(searchTerm.toLocaleLowerCase())
         )}
+        itemActionLabel="Delete"
+        onItemAction={deleteBook}
       />
     </>
   );
@@ -128,14 +136,25 @@ const InputWithLabel = ({
 
 interface ListProps {
   list: Book[];
+  itemActionLabel: string;
+  onItemAction: (objectID: number) => void;
 }
 
-const List = ({ list }: ListProps) => {
+const List = ({ list, itemActionLabel, onItemAction }: ListProps) => {
   console.log("List renders");
+
   return (
     <ul>
       {list.map(({ objectID, ...item }) => (
-        <Item key={objectID} {...item} />
+        <div className="item_grid">
+          <Item key={objectID} {...item} />
+          <Button
+            label={itemActionLabel}
+            onClickHandler={() => {
+              onItemAction(objectID);
+            }}
+          />
+        </div>
       ))}
     </ul>
   );
@@ -189,5 +208,14 @@ const RadioSelection = ({ id, options }: RadioExclusiveSelectionProps) => {
     </>
   );
 };
+
+interface ButtonProps {
+  label: string;
+  onClickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+const Button = ({ label, onClickHandler }: ButtonProps) => (
+  <button onClick={onClickHandler}>{label}</button>
+);
 
 export default App;
