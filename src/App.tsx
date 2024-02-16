@@ -61,10 +61,17 @@ const App = () => {
   // make it stateful so rerendering happens automatically
   const [stories, setStories] = React.useState<Book[]>([]);
 
+  const [booksLoading, setBooksLoading] = React.useState(false);
+  const [hasError, setHasError] = React.useState(false);
+
   React.useEffect(() => {
-    getAsyncStories().then((result) => {
-      setStories(result.data.stories);
-    });
+    setBooksLoading(true);
+    getAsyncStories()
+      .then((result) => {
+        setStories(result.data.stories);
+        setBooksLoading(false);
+      })
+      .catch(() => setHasError(true));
   }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,13 +100,18 @@ const App = () => {
 
       <hr />
 
-      <List
-        list={stories.filter((item: Book) =>
-          item.title.toLowerCase().includes(searchTerm.toLocaleLowerCase())
-        )}
-        itemActionLabel="Delete"
-        onItemAction={deleteBook}
-      />
+      {hasError && <p>Error, something went wrong</p>}
+      {booksLoading ? (
+        <LoadingScreen />
+      ) : (
+        <List
+          list={stories.filter((item: Book) =>
+            item.title.toLowerCase().includes(searchTerm.toLocaleLowerCase())
+          )}
+          itemActionLabel="Delete"
+          onItemAction={deleteBook}
+        />
+      )}
     </>
   );
 };
@@ -229,5 +241,7 @@ interface ButtonProps {
 const Button = ({ label, onClickHandler }: ButtonProps) => (
   <button onClick={onClickHandler}>{label}</button>
 );
+
+const LoadingScreen = () => <p>Loading ...</p>;
 
 export default App;
