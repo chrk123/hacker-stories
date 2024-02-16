@@ -47,12 +47,25 @@ const App = () => {
     },
   ];
 
+  // passed function to promise constructor gets executed at construction
+  // so at construction, we initiate the 2000ms timeout, which will resolved the promises after
+  const getAsyncStories = () =>
+    new Promise<{ data: { stories: Book[] } }>((resolve) =>
+      setTimeout(() => resolve({ data: { stories: defaultStories } }), 2000)
+    );
+
   console.log("App renders");
 
   const [searchTerm, setSearchTerm] = useStorageState("search", "React");
 
   // make it stateful so rerendering happens automatically
-  const [stories, setStories] = React.useState(defaultStories);
+  const [stories, setStories] = React.useState<Book[]>([]);
+
+  React.useEffect(() => {
+    getAsyncStories().then((result) => {
+      setStories(result.data.stories);
+    });
+  }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
