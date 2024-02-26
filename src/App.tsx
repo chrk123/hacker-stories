@@ -29,6 +29,9 @@ const useStorageState = (key: string, initialState: string) => {
 
 enum StoriesActionType {
   SetStories,
+  DeleteStory,
+  StartFetching,
+  ReportError,
 }
 
 interface SetStoriesAction {
@@ -36,74 +39,110 @@ interface SetStoriesAction {
   payload: Book[];
 }
 
-type StoriesAction = SetStoriesAction
+interface DeleteStoryAction {
+  type: StoriesActionType.DeleteStory;
+  payload: number;
+}
+
+interface StartFetchingAction {
+  type: StoriesActionType.StartFetching;
+}
+
+interface ReportErrorAction {
+  type: StoriesActionType.ReportError;
+  payload: string;
+}
+
+interface BookState {
+  books: Book[];
+  isLoading: boolean;
+  hasError: boolean;
+}
+
+type StoriesAction =
+  | SetStoriesAction
+  | DeleteStoryAction
+  | StartFetchingAction
+  | ReportErrorAction;
+
+const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
 const App = () => {
-  const defaultStories: Book[] = [
-    {
-      title: "React",
-      url: "https://reactjs.org/",
-      author: "Jordan Walke",
-      num_comments: 3,
-      points: 4,
-      objectID: 0,
-    },
-    {
-      title: "Redux",
-      url: "https://redux.js.org/",
-      author: "Dan Abramov, Andrew Clark",
-      num_comments: 2,
-      points: 5,
-      objectID: 1,
-    },
-  ];
-
-  // passed function to promise constructor gets executed at construction
-  // so at construction, we initiate the 2000ms timeout, which will resolved the promises after
-  const getAsyncStories = () =>
-    new Promise<{ data: { stories: Book[] } }>((resolve) =>
-      setTimeout(() => resolve({ data: { stories: defaultStories } }), 2000)
-    );
-
   console.log("App renders");
 
   const [searchTerm, setSearchTerm] = useStorageState("search", "React");
 
-  const storiesReducer = (state : Book[], action : StoriesAction): Book[] => {
-    if (action.type === StoriesActionType.SetStories) {
-      return action.payload;
+  const storiesReducer = (
+    state: BookState,
+    action: StoriesAction
+  ): BookState => {
+    switch (action.type) {
+      case StoriesActionType.StartFetching:
+        return { ...state, books: [], isLoading: true, hasError: false };
+      case StoriesActionType.ReportError:
+        return { ...state, books: [], isLoading: false, hasError: true };
+      case StoriesActionType.SetStories:
+        return {
+          ...state,
+          books: action.payload,
+          isLoading: false,
+          hasError: false,
+        };
+      case StoriesActionType.DeleteStory:
+        return {
+          ...state,
+          books: state.books.filter(
+            (item: Book) => item.objectID !== action.payload
+          ),
+          isLoading: false,
+          hasError: false,
+        };
+    }
+  };
+
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, {
+    books: [],
+    isLoading: true,
+    hasError: false,
+  });
+
+  const handleFetchStories = React.useCallback(() => {
+    if (!searchTerm) {
+      dispatchStories({ type: StoriesActionType.SetStories, payload: [] });
+      return;
     }
 
-    return state;
-  }
+    dispatchStories({
+      type: StoriesActionType.StartFetching,
+    });
 
-  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
-
-  const [booksLoading, setBooksLoading] = React.useState(false);
-  const [hasError, setHasError] = React.useState(false);
-
-  React.useEffect(() => {
-    setBooksLoading(true);
-    getAsyncStories()
+    fetch(`${API_ENDPOINT}${searchTerm}`)
+      // parses html body as json
+      .then((response) => response.json())
       .then((result) => {
         dispatchStories({
           type: StoriesActionType.SetStories,
-          payload: result.data.stories}
-          );
-        setBooksLoading(false);
+          payload: result.hits,
+        });
       })
-      .catch(() => setHasError(true));
+      .catch(() =>
+        dispatchStories({
+          type: StoriesActionType.ReportError,
+          payload: "Error",
+        })
+      );
   }, []);
+
+  React.useEffect(() => {
+    handleFetchStories();
+  }, [handleFetchStories]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
   const deleteBook = (objectID: number) =>
-    dispatchStories(
-      {type: StoriesActionType.SetStories,
-       payload: stories.filter((item: Book) => item.objectID != objectID)
-      });
+    dispatchStories({ type: StoriesActionType.DeleteStory, payload: objectID });
 
   return (
     <>
@@ -124,14 +163,12 @@ const App = () => {
 
       <hr />
 
-      {hasError && <p>Error, something went wrong</p>}
-      {booksLoading ? (
+      {stories.hasError && <p>Error, something went wrong</p>}
+      {stories.isLoading ? (
         <LoadingScreen />
       ) : (
         <List
-          list={stories.filter((item: Book) =>
-            item.title.toLowerCase().includes(searchTerm.toLocaleLowerCase())
-          )}
+          list={stories.books}
           itemActionLabel="Delete"
           onItemAction={deleteBook}
         />
