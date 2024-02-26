@@ -27,6 +27,17 @@ const useStorageState = (key: string, initialState: string) => {
   return [value, setValue] as const;
 };
 
+enum StoriesActionType {
+  SetStories,
+}
+
+interface SetStoriesAction {
+  type: StoriesActionType.SetStories;
+  payload: Book[];
+}
+
+type StoriesAction = SetStoriesAction
+
 const App = () => {
   const defaultStories: Book[] = [
     {
@@ -58,8 +69,15 @@ const App = () => {
 
   const [searchTerm, setSearchTerm] = useStorageState("search", "React");
 
-  // make it stateful so rerendering happens automatically
-  const [stories, setStories] = React.useState<Book[]>([]);
+  const storiesReducer = (state : Book[], action : StoriesAction): Book[] => {
+    if (action.type === StoriesActionType.SetStories) {
+      return action.payload;
+    }
+
+    return state;
+  }
+
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
 
   const [booksLoading, setBooksLoading] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
@@ -68,7 +86,10 @@ const App = () => {
     setBooksLoading(true);
     getAsyncStories()
       .then((result) => {
-        setStories(result.data.stories);
+        dispatchStories({
+          type: StoriesActionType.SetStories,
+          payload: result.data.stories}
+          );
         setBooksLoading(false);
       })
       .catch(() => setHasError(true));
@@ -79,7 +100,10 @@ const App = () => {
   };
 
   const deleteBook = (objectID: number) =>
-    setStories(stories.filter((item: Book) => item.objectID != objectID));
+    dispatchStories(
+      {type: StoriesActionType.SetStories,
+       payload: stories.filter((item: Book) => item.objectID != objectID)
+      });
 
   return (
     <>
