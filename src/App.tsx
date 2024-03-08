@@ -1,4 +1,5 @@
 import * as React from "react";
+import axios from "axios";
 
 interface Book {
   title: string;
@@ -124,13 +125,12 @@ const App = () => {
       type: StoriesActionType.StartFetching,
     });
 
-    fetch(searchUrl)
-      // parses html body as json
-      .then((response) => response.json())
+    axios
+      .get(searchUrl)
       .then((result) => {
         dispatchStories({
           type: StoriesActionType.SetStories,
-          payload: result.hits,
+          payload: result.data.hits,
         });
       })
       .catch(() =>
