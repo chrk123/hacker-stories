@@ -106,6 +106,14 @@ const App = () => {
     hasError: false,
   });
 
+  const [searchUrl, setSearchUrl] = React.useState(
+    `${API_ENDPOINT}${searchTerm}`
+  );
+
+  const querySearch = () => {
+    setSearchUrl(`${API_ENDPOINT}${searchTerm}`);
+  };
+
   const handleFetchStories = React.useCallback(() => {
     if (!searchTerm) {
       dispatchStories({ type: StoriesActionType.SetStories, payload: [] });
@@ -116,7 +124,7 @@ const App = () => {
       type: StoriesActionType.StartFetching,
     });
 
-    fetch(`${API_ENDPOINT}${searchTerm}`)
+    fetch(searchUrl)
       // parses html body as json
       .then((response) => response.json())
       .then((result) => {
@@ -131,7 +139,7 @@ const App = () => {
           payload: "Error",
         })
       );
-  }, []);
+  }, [searchUrl]);
 
   React.useEffect(() => {
     handleFetchStories();
@@ -160,6 +168,11 @@ const App = () => {
       >
         <strong>Search: </strong>
       </InputWithLabel>
+      <Button
+        disabled={!searchTerm}
+        label={"Go!"}
+        onClickHandler={querySearch}
+      />
 
       <hr />
 
@@ -296,11 +309,14 @@ const RadioSelection = ({ id, options }: RadioExclusiveSelectionProps) => {
 
 interface ButtonProps {
   label: string;
+  disabled?: boolean;
   onClickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const Button = ({ label, onClickHandler }: ButtonProps) => (
-  <button onClick={onClickHandler}>{label}</button>
+const Button = ({ label, disabled, onClickHandler }: ButtonProps) => (
+  <button disabled={disabled} onClick={onClickHandler}>
+    {label}
+  </button>
 );
 
 const LoadingScreen = () => <p>Loading ...</p>;
