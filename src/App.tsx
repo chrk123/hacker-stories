@@ -115,7 +115,7 @@ const App = () => {
     setSearchUrl(`${API_ENDPOINT}${searchTerm}`);
   };
 
-  const handleFetchStories = React.useCallback(() => {
+  const handleFetchStories = React.useCallback(async () => {
     if (!searchTerm) {
       dispatchStories({ type: StoriesActionType.SetStories, payload: [] });
       return;
@@ -125,20 +125,19 @@ const App = () => {
       type: StoriesActionType.StartFetching,
     });
 
-    axios
-      .get(searchUrl)
-      .then((result) => {
-        dispatchStories({
-          type: StoriesActionType.SetStories,
-          payload: result.data.hits,
-        });
-      })
-      .catch(() =>
-        dispatchStories({
-          type: StoriesActionType.ReportError,
-          payload: "Error",
-        })
-      );
+    try {
+      const result = await axios.get(searchUrl);
+
+      dispatchStories({
+        type: StoriesActionType.SetStories,
+        payload: result.data.hits,
+      });
+    } catch {
+      dispatchStories({
+        type: StoriesActionType.ReportError,
+        payload: "error",
+      });
+    }
   }, [searchUrl]);
 
   React.useEffect(() => {
