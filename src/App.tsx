@@ -111,8 +111,9 @@ const App = () => {
     `${API_ENDPOINT}${searchTerm}`
   );
 
-  const querySearch = () => {
+  const querySearch = (event: React.SyntheticEvent<HTMLFormElement>) => {
     setSearchUrl(`${API_ENDPOINT}${searchTerm}`);
+    event.preventDefault();
   };
 
   const handleFetchStories = React.useCallback(async () => {
@@ -159,20 +160,11 @@ const App = () => {
       <RadioSelection id="radio" options={["a", "b"]} />
       <br />
       <br />
-      <InputWithLabel
-        id="search"
-        value={searchTerm}
-        isFocused={true}
-        onInputChange={handleSearch}
-      >
-        <strong>Search: </strong>
-      </InputWithLabel>
-      <Button
-        disabled={!searchTerm}
-        label={"Go!"}
-        onClickHandler={querySearch}
+      <SearchForm
+        searchTerm={searchTerm}
+        onInputChanged={handleSearch}
+        onSubmit={querySearch}
       />
-
       <hr />
 
       {stories.hasError && <p>Error, something went wrong</p>}
@@ -188,6 +180,30 @@ const App = () => {
     </>
   );
 };
+
+interface SearchFormProps {
+  searchTerm: string;
+  onInputChanged: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSubmit: (event: React.SyntheticEvent<HTMLFormElement>) => void;
+}
+
+const SearchForm = ({
+  searchTerm,
+  onInputChanged,
+  onSubmit,
+}: SearchFormProps) => (
+  <form onSubmit={onSubmit}>
+    <InputWithLabel
+      id="search"
+      value={searchTerm}
+      isFocused={true}
+      onInputChange={onInputChanged}
+    >
+      <strong>Search: </strong>
+    </InputWithLabel>
+    <Button type={"submit"} disabled={!searchTerm} label={"Go!"} />
+  </form>
+);
 
 interface InputWithLabelProps {
   id: string;
@@ -212,7 +228,6 @@ const InputWithLabel = ({
 
   React.useEffect(() => {
     if (isFocused && inputRef.current) {
-      // D
       inputRef.current.focus();
     }
   }, [isFocused]);
@@ -309,11 +324,12 @@ const RadioSelection = ({ id, options }: RadioExclusiveSelectionProps) => {
 interface ButtonProps {
   label: string;
   disabled?: boolean;
-  onClickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  type?: "button" | "submit" | "reset";
+  onClickHandler?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const Button = ({ label, disabled, onClickHandler }: ButtonProps) => (
-  <button disabled={disabled} onClick={onClickHandler}>
+const Button = ({ label, type, disabled, onClickHandler }: ButtonProps) => (
+  <button type={type} disabled={disabled} onClick={onClickHandler}>
     {label}
   </button>
 );
