@@ -1,6 +1,7 @@
 import * as React from "react";
 import axios from "axios";
-import "./App.css";
+import styles from "./App.module.css";
+import clsx from "clsx";
 
 interface Book {
   title: string;
@@ -154,8 +155,8 @@ const App = () => {
     dispatchStories({ type: StoriesActionType.DeleteStory, payload: objectID });
 
   return (
-    <div className="container">
-      <h1 className="headline-primary">
+    <div className={styles.container}>
+      <h1 className={styles.headlinePrimary}>
         {welcomeStrings.greeting} {welcomeStrings.title}
       </h1>
       <RadioSelection id="radio" options={["a", "b"]} />
@@ -192,7 +193,7 @@ const SearchForm = ({
   onInputChanged,
   onSubmit,
 }: SearchFormProps) => (
-  <form onSubmit={onSubmit} className="search-form">
+  <form onSubmit={onSubmit} className={styles.searchForm}>
     <InputWithLabel
       id="search"
       value={searchTerm}
@@ -239,11 +240,11 @@ const InputWithLabel = ({
 
   return (
     <>
-      <label className="label" htmlFor={id}>
+      <label className={styles.label} htmlFor={id}>
         {children}
       </label>
       <input
-        className="input"
+        className={styles.input}
         id={id}
         ref={inputRef}
         type={type}
@@ -292,7 +293,7 @@ interface ItemProps {
 const Item = ({ title, url, author, num_comments, points }: ItemProps) => {
   console.log("Item renders");
   return (
-    <li className="item">
+    <li className={styles.item}>
       <span style={{ width: "40%" }}>
         <a href={url}>{title}:</a>
       </span>
@@ -346,7 +347,10 @@ const Button = ({
   onClickHandler,
 }: ButtonProps) => (
   <button
-    className={"button" + ` button_${styleClass}`}
+    className={clsx(
+      styles.button,
+      styleClass === "large" ? styles.button_large : styles.button_small
+    )}
     type={type}
     disabled={disabled}
     onClick={onClickHandler}
