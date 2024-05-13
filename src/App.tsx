@@ -1,5 +1,6 @@
 import * as React from "react";
 import axios from "axios";
+import "./App.css";
 
 interface Book {
   title: string;
@@ -153,8 +154,8 @@ const App = () => {
     dispatchStories({ type: StoriesActionType.DeleteStory, payload: objectID });
 
   return (
-    <>
-      <h1>
+    <div className="container">
+      <h1 className="headline-primary">
         {welcomeStrings.greeting} {welcomeStrings.title}
       </h1>
       <RadioSelection id="radio" options={["a", "b"]} />
@@ -165,7 +166,6 @@ const App = () => {
         onInputChanged={handleSearch}
         onSubmit={querySearch}
       />
-      <hr />
 
       {stories.hasError && <p>Error, something went wrong</p>}
       {stories.isLoading ? (
@@ -177,7 +177,7 @@ const App = () => {
           onItemAction={deleteBook}
         />
       )}
-    </>
+    </div>
   );
 };
 
@@ -192,7 +192,7 @@ const SearchForm = ({
   onInputChanged,
   onSubmit,
 }: SearchFormProps) => (
-  <form onSubmit={onSubmit}>
+  <form onSubmit={onSubmit} className="search-form">
     <InputWithLabel
       id="search"
       value={searchTerm}
@@ -201,7 +201,12 @@ const SearchForm = ({
     >
       <strong>Search: </strong>
     </InputWithLabel>
-    <Button type={"submit"} disabled={!searchTerm} label={"Go!"} />
+    <Button
+      styleClass="large"
+      type={"submit"}
+      disabled={!searchTerm}
+      label={"Go!"}
+    />
   </form>
 );
 
@@ -234,8 +239,11 @@ const InputWithLabel = ({
 
   return (
     <>
-      <label htmlFor={id}>{children}</label>
+      <label className="label" htmlFor={id}>
+        {children}
+      </label>
       <input
+        className="input"
         id={id}
         ref={inputRef}
         type={type}
@@ -261,6 +269,7 @@ const List = ({ list, itemActionLabel, onItemAction }: ListProps) => {
         <div className="item_grid">
           <Item key={objectID} {...item} />
           <Button
+            styleClass="small"
             label={itemActionLabel}
             onClickHandler={() => {
               onItemAction(objectID);
@@ -283,13 +292,13 @@ interface ItemProps {
 const Item = ({ title, url, author, num_comments, points }: ItemProps) => {
   console.log("Item renders");
   return (
-    <li>
-      <span>
+    <li className="item">
+      <span style={{ width: "40%" }}>
         <a href={url}>{title}:</a>
       </span>
-      <span>, {author}</span>
-      <span>, {num_comments}</span>
-      <span>, {points}</span>
+      <span style={{ width: "30%" }}>{author}</span>
+      <span style={{ width: "10%" }}>{num_comments}</span>
+      <span style={{ width: "10%" }}>{points}</span>
     </li>
   );
 };
@@ -322,14 +331,26 @@ const RadioSelection = ({ id, options }: RadioExclusiveSelectionProps) => {
 };
 
 interface ButtonProps {
+  styleClass: "large" | "small";
   label: string;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
   onClickHandler?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const Button = ({ label, type, disabled, onClickHandler }: ButtonProps) => (
-  <button type={type} disabled={disabled} onClick={onClickHandler}>
+const Button = ({
+  styleClass,
+  label,
+  type,
+  disabled,
+  onClickHandler,
+}: ButtonProps) => (
+  <button
+    className={"button" + ` button_${styleClass}`}
+    type={type}
+    disabled={disabled}
+    onClick={onClickHandler}
+  >
     {label}
   </button>
 );
