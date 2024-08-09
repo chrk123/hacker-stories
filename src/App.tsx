@@ -4,7 +4,7 @@ import styles from "./App.module.css";
 import clsx from "clsx";
 import Check from "./check.svg?react";
 
-interface Book {
+export interface Book {
   title: string;
   url: string;
   author: string;
@@ -20,9 +20,7 @@ interface welcome {
 const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
 
 const useStorageState = (key: string, initialState: string) => {
-  const [value, setValue] = React.useState(
-    localStorage.getItem(key) || initialState
-  );
+  const [value, setValue] = React.useState(localStorage.getItem(key) || initialState);
 
   React.useEffect(() => {
     localStorage.setItem(key, value);
@@ -31,78 +29,69 @@ const useStorageState = (key: string, initialState: string) => {
   return [value, setValue] as const;
 };
 
-enum StoriesActionType {
+export enum StoriesActionType {
   SetStories,
   DeleteStory,
   StartFetching,
   ReportError,
 }
 
-interface SetStoriesAction {
+export interface SetStoriesAction {
   type: StoriesActionType.SetStories;
   payload: Book[];
 }
 
-interface DeleteStoryAction {
+export interface DeleteStoryAction {
   type: StoriesActionType.DeleteStory;
   payload: number;
 }
 
-interface StartFetchingAction {
+export interface StartFetchingAction {
   type: StoriesActionType.StartFetching;
 }
 
-interface ReportErrorAction {
+export interface ReportErrorAction {
   type: StoriesActionType.ReportError;
   payload: string;
 }
 
-interface BookState {
+export interface BookState {
   books: Book[];
   isLoading: boolean;
   hasError: boolean;
 }
 
-type StoriesAction =
-  | SetStoriesAction
-  | DeleteStoryAction
-  | StartFetchingAction
-  | ReportErrorAction;
+export type StoriesAction = SetStoriesAction | DeleteStoryAction | StartFetchingAction | ReportErrorAction;
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
+
+const storiesReducer = (state: BookState, action: StoriesAction): BookState => {
+  switch (action.type) {
+    case StoriesActionType.StartFetching:
+      return { ...state, books: [], isLoading: true, hasError: false };
+    case StoriesActionType.ReportError:
+      return { ...state, books: [], isLoading: false, hasError: true };
+    case StoriesActionType.SetStories:
+      return {
+        ...state,
+        books: action.payload,
+        isLoading: false,
+        hasError: false,
+      };
+    case StoriesActionType.DeleteStory:
+      return {
+        ...state,
+        books: state.books.filter((item: Book) => item.objectID !== action.payload),
+        isLoading: false,
+        hasError: false,
+      };
+  }
+};
 
 const App = () => {
   console.log("App renders");
 
   const [searchTerm, setSearchTerm] = useStorageState("search", "React");
-
-  const storiesReducer = (
-    state: BookState,
-    action: StoriesAction
-  ): BookState => {
-    switch (action.type) {
-      case StoriesActionType.StartFetching:
-        return { ...state, books: [], isLoading: true, hasError: false };
-      case StoriesActionType.ReportError:
-        return { ...state, books: [], isLoading: false, hasError: true };
-      case StoriesActionType.SetStories:
-        return {
-          ...state,
-          books: action.payload,
-          isLoading: false,
-          hasError: false,
-        };
-      case StoriesActionType.DeleteStory:
-        return {
-          ...state,
-          books: state.books.filter(
-            (item: Book) => item.objectID !== action.payload
-          ),
-          isLoading: false,
-          hasError: false,
-        };
-    }
-  };
 
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     books: [],
@@ -110,9 +99,7 @@ const App = () => {
     hasError: false,
   });
 
-  const [searchUrl, setSearchUrl] = React.useState(
-    `${API_ENDPOINT}${searchTerm}`
-  );
+  const [searchUrl, setSearchUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
 
   const querySearch = (event: React.SyntheticEvent<HTMLFormElement>) => {
     setSearchUrl(`${API_ENDPOINT}${searchTerm}`);
@@ -152,8 +139,7 @@ const App = () => {
     setSearchTerm(event.target.value);
   };
 
-  const deleteBook = (objectID: number) =>
-    dispatchStories({ type: StoriesActionType.DeleteStory, payload: objectID });
+  const deleteBook = (objectID: number) => dispatchStories({ type: StoriesActionType.DeleteStory, payload: objectID });
 
   return (
     <div className={styles.container}>
@@ -163,21 +149,13 @@ const App = () => {
       <RadioSelection id="radio" options={["a", "b"]} />
       <br />
       <br />
-      <SearchForm
-        searchTerm={searchTerm}
-        onInputChanged={handleSearch}
-        onSubmit={querySearch}
-      />
+      <SearchForm searchTerm={searchTerm} onInputChanged={handleSearch} onSubmit={querySearch} />
 
       {stories.hasError && <p>Error, something went wrong</p>}
       {stories.isLoading ? (
         <LoadingScreen />
       ) : (
-        <List
-          list={stories.books}
-          itemActionLabel="Delete"
-          onItemAction={deleteBook}
-        />
+        <List list={stories.books} itemActionLabel="Delete" onItemAction={deleteBook} />
       )}
     </div>
   );
@@ -189,26 +167,12 @@ interface SearchFormProps {
   onSubmit: (event: React.SyntheticEvent<HTMLFormElement>) => void;
 }
 
-const SearchForm = ({
-  searchTerm,
-  onInputChanged,
-  onSubmit,
-}: SearchFormProps) => (
+const SearchForm = ({ searchTerm, onInputChanged, onSubmit }: SearchFormProps) => (
   <form onSubmit={onSubmit} className={styles.searchForm}>
-    <InputWithLabel
-      id="search"
-      value={searchTerm}
-      isFocused={true}
-      onInputChange={onInputChanged}
-    >
+    <InputWithLabel id="search" value={searchTerm} isFocused={true} onInputChange={onInputChanged}>
       <strong>Search: </strong>
     </InputWithLabel>
-    <Button
-      styleClass="large"
-      type={"submit"}
-      disabled={!searchTerm}
-      label={"Go!"}
-    />
+    <Button styleClass="large" type={"submit"} disabled={!searchTerm} label={"Go!"} />
   </form>
 );
 
@@ -244,14 +208,7 @@ const InputWithLabel = ({
       <label className={styles.label} htmlFor={id}>
         {children}
       </label>
-      <input
-        className={styles.input}
-        id={id}
-        ref={inputRef}
-        type={type}
-        value={value}
-        onChange={onInputChange}
-      />
+      <input className={styles.input} id={id} ref={inputRef} type={type} value={value} onChange={onInputChange} />
     </>
   );
 };
@@ -275,8 +232,7 @@ const List = ({ list, itemActionLabel, onItemAction }: ListProps) => {
             label={itemActionLabel}
             onClickHandler={() => {
               onItemAction(objectID);
-            }}
-          >
+            }}>
             <Check width="18px" height="18px" />
           </Button>
         </div>
@@ -320,12 +276,7 @@ const RadioSelection = ({ id, options }: RadioExclusiveSelectionProps) => {
 
         return (
           <>
-            <input
-              type="radio"
-              id={index}
-              name={`${id}_radiogroup`}
-              value={option}
-            />
+            <input type="radio" id={index} name={`${id}_radiogroup`} value={option} />
             <label htmlFor={index}>{option}</label>
           </>
         );
@@ -351,14 +302,10 @@ const Button = ({
   children,
 }: React.PropsWithChildren<ButtonProps>) => (
   <button
-    className={clsx(
-      styles.button,
-      styleClass === "large" ? styles.button_large : styles.button_small
-    )}
+    className={clsx(styles.button, styleClass === "large" ? styles.button_large : styles.button_small)}
     type={type}
     disabled={disabled}
-    onClick={onClickHandler}
-  >
+    onClick={onClickHandler}>
     {children ? children : label}
   </button>
 );
@@ -366,3 +313,4 @@ const Button = ({
 const LoadingScreen = () => <p>Loading ...</p>;
 
 export default App;
+export { storiesReducer, SearchForm, InputWithLabel, List, Item };
