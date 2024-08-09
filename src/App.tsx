@@ -2,6 +2,7 @@ import * as React from "react";
 import axios from "axios";
 import styles from "./App.module.css";
 import clsx from "clsx";
+import Check from "./check.svg?react";
 
 interface Book {
   title: string;
@@ -275,7 +276,9 @@ const List = ({ list, itemActionLabel, onItemAction }: ListProps) => {
             onClickHandler={() => {
               onItemAction(objectID);
             }}
-          />
+          >
+            <Check width="18px" height="18px" />
+          </Button>
         </div>
       ))}
     </ul>
@@ -345,7 +348,8 @@ const Button = ({
   type,
   disabled,
   onClickHandler,
-}: ButtonProps) => (
+  children,
+}: React.PropsWithChildren<ButtonProps>) => (
   <button
     className={clsx(
       styles.button,
@@ -355,7 +359,7 @@ const Button = ({
     disabled={disabled}
     onClick={onClickHandler}
   >
-    {label}
+    {children ? children : label}
   </button>
 );
 

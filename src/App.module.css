@@ -18,16 +18,18 @@
   padding-bottom: 5px;
 }
 
-.item > span {
-  padding: 0 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+.item {
+  > span {
+    padding: 0 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
-.item > span > a {
-  color: inherit;
+    > a {
+      color: inherit;
+    }
+  }
 }
 
 .button {
@@ -36,11 +38,15 @@
   padding: 5px;
   cursor: pointer;
   transition: all 0.1s ease-in;
-}
 
-.button:hover {
-  background: #171212;
-  color: #ffffff;
+  &:hover {
+    > svg {
+      > g {
+        fill: #ffffff;
+        stroke: #ffffff;
+      }
+    }
+  }
 }
 
 .button_small {
