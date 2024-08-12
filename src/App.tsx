@@ -20,7 +20,9 @@ interface welcome {
 const welcomeStrings: welcome = { greeting: "Hey", title: "React" };
 
 const useStorageState = (key: string, initialState: string) => {
-  const [value, setValue] = React.useState(localStorage.getItem(key) || initialState);
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
 
   React.useEffect(() => {
     localStorage.setItem(key, value);
@@ -61,9 +63,36 @@ export interface BookState {
   hasError: boolean;
 }
 
-export type StoriesAction = SetStoriesAction | DeleteStoryAction | StartFetchingAction | ReportErrorAction;
+export type StoriesAction =
+  | SetStoriesAction
+  | DeleteStoryAction
+  | StartFetchingAction
+  | ReportErrorAction;
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
+
+type SortType = "None" | "Author";
+
+const asSortType: (str: string) => SortType = (str) => {
+  if (str === "Author") return "Author";
+
+  return "None";
+};
+
+const sortStories = (books: Book[], sortType: SortType) => {
+  const lexicographicComparison = (lhs: string, rhs: string) => {
+    if (lhs === rhs) return 0;
+
+    return lhs < rhs ? -1 : +1;
+  };
+
+  if (sortType === "Author")
+    return books.sort((lhs, rhs) => {
+      return lexicographicComparison(lhs.author, rhs.author);
+    });
+
+  return books;
+};
 
 const storiesReducer = (state: BookState, action: StoriesAction): BookState => {
   switch (action.type) {
@@ -81,7 +110,9 @@ const storiesReducer = (state: BookState, action: StoriesAction): BookState => {
     case StoriesActionType.DeleteStory:
       return {
         ...state,
-        books: state.books.filter((item: Book) => item.objectID !== action.payload),
+        books: state.books.filter(
+          (item: Book) => item.objectID !== action.payload
+        ),
         isLoading: false,
         hasError: false,
       };
@@ -99,7 +130,11 @@ const App = () => {
     hasError: false,
   });
 
-  const [searchUrl, setSearchUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
+  const [sorting, setSorting] = React.useState<SortType>("None");
+
+  const [searchUrl, setSearchUrl] = React.useState(
+    `${API_ENDPOINT}${searchTerm}`
+  );
 
   const querySearch = (event: React.SyntheticEvent<HTMLFormElement>) => {
     setSearchUrl(`${API_ENDPOINT}${searchTerm}`);
@@ -139,23 +174,38 @@ const App = () => {
     setSearchTerm(event.target.value);
   };
 
-  const deleteBook = (objectID: number) => dispatchStories({ type: StoriesActionType.DeleteStory, payload: objectID });
+  const deleteBook = (objectID: number) =>
+    dispatchStories({ type: StoriesActionType.DeleteStory, payload: objectID });
 
   return (
     <div className={styles.container}>
       <h1 className={styles.headlinePrimary}>
         {welcomeStrings.greeting} {welcomeStrings.title}
       </h1>
-      <RadioSelection id="radio" options={["a", "b"]} />
+      <RadioSelection
+        id="radio"
+        options={["Author", "None"]}
+        onChange={(option) => {
+          setSorting(asSortType(option));
+        }}
+      />
       <br />
       <br />
-      <SearchForm searchTerm={searchTerm} onInputChanged={handleSearch} onSubmit={querySearch} />
+      <SearchForm
+        searchTerm={searchTerm}
+        onInputChanged={handleSearch}
+        onSubmit={querySearch}
+      />
 
       {stories.hasError && <p>Error, something went wrong</p>}
       {stories.isLoading ? (
         <LoadingScreen />
       ) : (
-        <List list={stories.books} itemActionLabel="Delete" onItemAction={deleteBook} />
+        <List
+          list={sortStories(stories.books, sorting)}
+          itemActionLabel="Delete"
+          onItemAction={deleteBook}
+        />
       )}
     </div>
   );
@@ -167,12 +217,26 @@ interface SearchFormProps {
   onSubmit: (event: React.SyntheticEvent<HTMLFormElement>) => void;
 }
 
-const SearchForm = ({ searchTerm, onInputChanged, onSubmit }: SearchFormProps) => (
+const SearchForm = ({
+  searchTerm,
+  onInputChanged,
+  onSubmit,
+}: SearchFormProps) => (
   <form onSubmit={onSubmit} className={styles.searchForm}>
-    <InputWithLabel id="search" value={searchTerm} isFocused={true} onInputChange={onInputChanged}>
+    <InputWithLabel
+      id="search"
+      value={searchTerm}
+      isFocused={true}
+      onInputChange={onInputChanged}
+    >
       <strong>Search: </strong>
     </InputWithLabel>
-    <Button styleClass="large" type={"submit"} disabled={!searchTerm} label={"Go!"} />
+    <Button
+      styleClass="large"
+      type={"submit"}
+      disabled={!searchTerm}
+      label={"Go!"}
+    />
   </form>
 );
 
@@ -208,7 +272,14 @@ const InputWithLabel = ({
       <label className={styles.label} htmlFor={id}>
         {children}
       </label>
-      <input className={styles.input} id={id} ref={inputRef} type={type} value={value} onChange={onInputChange} />
+      <input
+        className={styles.input}
+        id={id}
+        ref={inputRef}
+        type={type}
+        value={value}
+        onChange={onInputChange}
+      />
     </>
   );
 };
@@ -232,7 +303,8 @@ const List = ({ list, itemActionLabel, onItemAction }: ListProps) => {
             label={itemActionLabel}
             onClickHandler={() => {
               onItemAction(objectID);
-            }}>
+            }}
+          >
             <Check width="18px" height="18px" />
           </Button>
         </div>
@@ -266,9 +338,19 @@ const Item = ({ title, url, author, num_comments, points }: ItemProps) => {
 interface RadioExclusiveSelectionProps {
   id: string;
   options: string[];
+  onChange: (option: string) => void;
 }
 
-const RadioSelection = ({ id, options }: RadioExclusiveSelectionProps) => {
+const RadioSelection = ({
+  id,
+  options,
+  onChange,
+}: RadioExclusiveSelectionProps) => {
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value);
+    return onChange(e.target.value);
+  };
+
   return (
     <>
       {options.map((option: string, idx: number) => {
@@ -276,7 +358,13 @@ const RadioSelection = ({ id, options }: RadioExclusiveSelectionProps) => {
 
         return (
           <>
-            <input type="radio" id={index} name={`${id}_radiogroup`} value={option} />
+            <input
+              type="radio"
+              id={index}
+              name={`${id}_radiogroup`}
+              value={option}
+              onChange={changeHandler}
+            />
             <label htmlFor={index}>{option}</label>
           </>
         );
@@ -302,10 +390,14 @@ const Button = ({
   children,
 }: React.PropsWithChildren<ButtonProps>) => (
   <button
-    className={clsx(styles.button, styleClass === "large" ? styles.button_large : styles.button_small)}
+    className={clsx(
+      styles.button,
+      styleClass === "large" ? styles.button_large : styles.button_small
+    )}
     type={type}
     disabled={disabled}
-    onClick={onClickHandler}>
+    onClick={onClickHandler}
+  >
     {children ? children : label}
   </button>
 );
